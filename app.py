@@ -55,9 +55,22 @@ def precipitation():
 
 
 
-@app.route("/jsonified")
-def jsonified():
-    return jsonify(hello_dict)
+@app.route("/api/v1.0/precipitation")
+def precipitation():
+    
+    session = Session(engine)
+    results = session.query(Measurement.date, Measurement.prcp).all()
+    
+    prcp_data = []
+    for date, prcp in results:
+        prcp_dict = {}
+        prcp_dict["date"] = prcp
+        prcp_data.append(prcp_dict)
+
+    return jsonify(prcp_data)
+
+
+
 
 
 if __name__ == "__main__":
