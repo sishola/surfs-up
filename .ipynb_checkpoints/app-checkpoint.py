@@ -7,13 +7,8 @@ from sqlalchemy.orm import Session
 from sqlalchemy import create_engine, func, desc
 
 
-import pandas as pd
-#import datetime as dt
-from dateutil import relativedelta
-
-
 ###DB Connection
-engine = create_engine("sqlite:///Resources/hawaii.sqlite")
+engine = create_engine("sqlite:///hawaii.sqlite")
 
 # reflect an existing database into a new model
 Base = automap_base()
@@ -48,44 +43,17 @@ def home():
 @app.route("/api/v1.0/precipitation")
 def precipitation():
     
+    #session = Session(engine)
     results = session.query(Measurement.date, Measurement.prcp).all()
     
     prcp_data = []
     for date, prcp in results:
+        #prcp_dict = {date : prcp}
         prcp_data.append({date : prcp})
 
     return jsonify(prcp_data)
 
 
-@app.route("/api/v1.0/stations")
-def stations():
-    
-    results = session.query(Station.station).distinct().all()
-    
-    station_data = []
-    for name in results:
-        station_data.append(name)
-
-    return jsonify(station_data)
-
-
-@app.route("/api/v1.0/tobs")
-def tobs():
-    
-    maxDate = session.query( func.max(Measurement.date).label('maxdate')).all()
-    maxDate = list(np.ravel(maxDate))
-
-    maxDate=pd.to_datetime(maxDate[0])
-
-    minDate = maxDate- relativedelta.relativedelta(months=12)
-
-    results = session.query(Measurement.date , Measurement.tobs).filter( Measurement.date >= minDate.date()).all()
-    
-    tobs_data = []
-    for date, tobs in results:
-        tobs_data.append([date,tobs])
-
-    return jsonify(tobs_data)
 
 
 
